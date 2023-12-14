@@ -7,17 +7,12 @@ BEGIN
     DECLARE project_id INT DEFAULT 0;
 
     SELECT COUNT(id)
-        INTO total_projects
-        FROM projects
-        WHERE name = project_name;
+        INTO total_projects FROM projects WHERE name = project_name;
     IF total_projects = 0 THEN
-        INSERT INTO projects(name)
-            VALUES(project_name);
+        INSERT INTO projects(name) VALUES(project_name);
     END IF;
     SELECT id
-        INTO project_id
-        FROM projects
-        WHERE name = project_name;
+        INTO project_id FROM projects WHERE name = project_name;
     INSERT INTO corrections(user_id, project_id, score)
         VALUES (user_id, project_id, score);
 END $$
