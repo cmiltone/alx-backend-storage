@@ -2,7 +2,7 @@
 CREATE FUNCTION SafeDiv(a INT, b INT)
 RETURNS FLOAT
 BEGIN
-DECLARE return_value FLOAT
+DECLARE return_value AS FLOAT
 IF b = 0
 SET return_value = 0;
 END
