@@ -1,4 +1,4 @@
---- script creates users table
+-- script creates users table
 
 DROP TABLE IF EXISTS users;
 
