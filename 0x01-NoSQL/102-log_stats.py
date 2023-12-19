@@ -62,3 +62,4 @@ if __name__ == '__main__':
     print('{} logs'.format(collection.count_documents({})))
 
     print_logs(collection)
+    print_ips(collection)
