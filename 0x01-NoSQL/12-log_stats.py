@@ -17,11 +17,8 @@ path=/status
 from pymongo import MongoClient
 
 
-def print_logs():
+def print_logs(collection):
     """Prints stats about Nginx request logs in MongoDB"""
-    client = MongoClient('mongodb://127.0.0.1:27017')
-    collection = client.logs.nginx
-
     print('{} logs'.format(client.count_documents({})))
 
     print('Methods:')
@@ -40,4 +37,7 @@ def print_logs():
 
 
 if __name__ == '__main__':
-    print_logs()
+    client = MongoClient('mongodb://127.0.0.1:27017')
+    collection = client.logs.nginx
+
+    print_logs(collection)
