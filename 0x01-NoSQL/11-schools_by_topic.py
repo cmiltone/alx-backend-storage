@@ -12,7 +12,7 @@ topic (string) will be topic searched
 def schools_by_topic(mongo_collection, topic):
     """lists school by topic"""
     docs = []
-    for doc in mongo_collection.find({'topic': {'$in': topic}}):
+    for doc in mongo_collection.find({'topic': {'$in': [topic]}}):
         docs.append(doc)
 
     return docs
