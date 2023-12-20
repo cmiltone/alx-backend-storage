@@ -28,7 +28,7 @@ class Cache:
     def store(self, data: Data) -> str:
         """stores data to redis"""
         key = str(uuid.uuid4())
-        self._redis.mset({key: data})
+        self._redis.set({key: data})
         return key
 
     def get(self, key: str, fn: Callable) -> Data:
@@ -46,9 +46,9 @@ class Cache:
         back to the desired format.
         """
         if fn is None:
-            return self._redis.mget(key)
+            return self._redis.get(key)
         else:
-            return fn(self._redis.mget(key))
+            return fn(self._redis.get(key))
 
     def get_str(self, key: str) -> str:
         """parametizes get"""
