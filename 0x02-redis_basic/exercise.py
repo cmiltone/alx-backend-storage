@@ -49,10 +49,10 @@ class Cache:
             return self._redis.get(key)
         return fn(self._redis.get(key))
     
-    def get_str(self):
+    def get_str(self, key: str) -> str:
         """parametizes get"""
-        pass
+        return self.get(key, lambda x: x.decode('utf-8'))
 
-    def get_int(self):
+    def get_int(self, key: str) -> int:
         """parametizes get"""
-        pass
+        return self.get(key, lambda x: int(x))
