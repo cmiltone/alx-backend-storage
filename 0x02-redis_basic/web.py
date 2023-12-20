@@ -22,7 +22,7 @@ import requests
 from functools import wraps
 from typing import Callable
 
-store = redis.Redis()
+redis_store = redis.Redis()
 
 
 def cached(method: Callable) -> Callable:
@@ -30,20 +30,13 @@ def cached(method: Callable) -> Callable:
     @wraps(method)
     def caller(url) -> str:
         """calls the method"""
-        store.incr(f'count:{url}')
-
-        return_value = store.get(f'result:{url}')
-
-        if return_value:
-            return return_value.decode('utf-8')
-
-        return_value = method(url)
-
-        store.set(f'count:{url}', 0)
-
-        store.setex(f'result:{url}', 10, return_value)
-
-        return return_value
+        result = redis_store.get(f'result:{url}')
+        if result:
+            return result.decode('utf-8')
+        result = method(url)
+        redis_store.set(f'count:{url}', 0)
+        redis_store.setex(f'result:{url}', 10, result)
+        return result
     return caller
 
 
