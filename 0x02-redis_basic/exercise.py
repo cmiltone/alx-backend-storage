@@ -19,7 +19,6 @@ from functools import wraps
 Data = Union[str, bytes, int, float]
 
 
-
 def count_calls(method: Callable) -> Callable:
     """
     Familiarize yourself with the INCR command and its python equivalent.
@@ -53,6 +52,7 @@ def count_calls(method: Callable) -> Callable:
             self._redis.incr(method.__qualname__)
         return method(self, *args, **kwargs)
     return caller
+
 
 def call_history(method: Callable) -> Callable:
     """
@@ -131,6 +131,7 @@ def replay(fn: Callable) -> None:
             input.decode("utf-8"),
             output,
         ))
+
 
 class Cache:
     """cache class"""
