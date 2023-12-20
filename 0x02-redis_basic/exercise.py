@@ -46,10 +46,10 @@ class Cache:
         back to the desired format.
         """
         value = self._redis.get(key)
-        if fn is None:
-            return value
-        else:
+        if fn is not None:
             return fn(value)
+        else:
+            return value
 
     def get_str(self, key: str) -> str:
         """parametizes get"""
