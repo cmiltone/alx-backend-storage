@@ -27,5 +27,5 @@ class Cache:
     def store(self, data: Data) -> str:
         """stores data to redis"""
         key = uuid.uuid4()
-        self._redis.mset(key, data)
+        self._redis.mset({key: data})
         return key
