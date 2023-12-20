@@ -31,7 +31,7 @@ class Cache:
         self._redis.mset({key: data})
         return key
 
-    def get(self, key: str, fn: Callable) -> Union[str, bytes, int, float]:
+    def get(self, key: str, fn: Callable) -> Data:
         """
         Redis only allows to store string, bytes and numbers
         (and lists thereof). Whatever you store as single
@@ -46,9 +46,9 @@ class Cache:
         back to the desired format.
         """
         if fn is None:
-            return self._redis.get(key)
+            return self._redis.mget(key)
         else:
-            return fn(self._redis.get(key))
+            return fn(self._redis.mget(key))
 
     def get_str(self, key: str) -> str:
         """parametizes get"""
