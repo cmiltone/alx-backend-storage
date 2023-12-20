@@ -45,11 +45,8 @@ class Cache:
         named fn. This callable will be used to convert the data
         back to the desired format.
         """
-        value = self._redis.get(key)
-        if fn is not None:
-            return fn(value)
-        else:
-            return value
+        data = self._redis.get(key)
+        return fn(data) if fn is not None else data
 
     def get_str(self, key: str) -> str:
         """parametizes get"""
