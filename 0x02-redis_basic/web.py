@@ -31,12 +31,18 @@ def cached(method: Callable) -> Callable:
     def caller(url) -> str:
         """calls the method"""
         store.incr(f'count:{url}')
-        return_value = store.get(f'value:{url}')
+
+        return_value = store.get(f'result:{url}')
+
         if return_value:
             return return_value.decode('utf-8')
+
         return_value = method(url)
+
         store.set(f'count:{url}', 0)
-        store.setex(f'value:{url}', 10, return_value)
+
+        store.setex(f'result:{url}', 10, return_value)
+
         return return_value
     return caller
 
