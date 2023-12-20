@@ -14,9 +14,21 @@ int or float.
 import redis
 import uuid
 from typing import Union, Callable
+from functools import wraps
 
 Data = Union[str, bytes, int, float]
 
+
+
+def count_calls(method: Callable) -> Callable:
+    """decorator"""
+    @wraps(method)
+    def caller(self, *args, **kwargs):
+        """calls the method"""
+        if isinstance(self._redis, redis.Redis):
+            self._redis.incr(method.__qualname__)
+        return method(self, *args, **kwargs)
+    return caller
 
 class Cache:
     """cache class"""
@@ -25,6 +37,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb(True)
 
+    @count_calls
     def store(self, data: Data) -> str:
         """stores data to redis"""
         key = str(uuid.uuid4())
