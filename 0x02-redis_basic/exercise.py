@@ -21,7 +21,31 @@ Data = Union[str, bytes, int, float]
 
 
 def count_calls(method: Callable) -> Callable:
-    """decorator"""
+    """
+    Familiarize yourself with the INCR command and its python equivalent.
+    In this task, we will implement a system to count how many times methods
+    of the Cache class are called.
+
+    Above Cache define a count_calls decorator that takes a single method
+    Callable argument and returns a Callable.
+
+    As a key, use the qualified name of method using the __qualname__ dunder
+    method.
+
+    Create and return function that increments the count for that key every
+    time the method is called and returns the value returned by the original
+    method.
+
+    Remember that the first argument of the wrapped function will be self which
+    is the instance itself, which lets you access the Redis instance.
+
+    Protip: when defining a decorator it is useful to use functool.wraps to
+    conserve the original function's name, docstring, etc. Make sure you
+    use it as described here:
+    https://docs.python.org/3.7/library/functools.html#functools.wraps
+
+    Decorate Cache.store with count_calls.
+    """
     @wraps(method)
     def caller(self, *args, **kwargs):
         """calls the method"""
@@ -31,7 +55,32 @@ def count_calls(method: Callable) -> Callable:
     return caller
 
 def call_history(method: Callable) -> Callable:
-    """decorator"""
+    """
+    Familiarize yourself with the INCR command and its python equivalent.
+
+    In this task, we will implement a system to count how many times methods
+    of the Cache class are called.
+
+    Above Cache define a count_calls decorator that takes a single method
+    Callable argument and returns a Callable.
+
+    As a key, use the qualified name of method using the __qualname__ dunder
+    method.
+
+    Create and return function that increments the count for that key every
+    time the method is called and returns the value returned by the original
+    method.
+
+    Remember that the first argument of the wrapped function will be self which
+    is the instance itself, which lets you access the Redis instance.
+
+    Protip: when defining a decorator it is useful to use functool.wraps to
+    conserve the original function’s name, docstring, etc. Make sure you use it
+    as described here:
+    https://docs.python.org/3.7/library/functools.html#functools.wraps
+
+    Decorate Cache.store with count_calls.
+    """
     @wraps(method)
     def caller(self, *args, **kwargs):
         """calls the method"""
@@ -44,6 +93,44 @@ def call_history(method: Callable) -> Callable:
             self._redis.rpush(key_of_output, return_val)
         return return_val
     return caller
+
+
+def replay(fn: Callable) -> None:
+    """
+    In this tasks, we will implement a replay function to display the
+    history of calls of a particular function.
+
+    Use keys generated in previous tasks to generate the following output:
+    >>> cache = Cache()
+    >>> cache.store("foo")
+    >>> cache.store("bar")
+    >>> cache.store(42)
+    >>> replay(cache.store)
+    Cache.store was called 3 times:
+    Cache.store(*('foo',)) -> 13bf32a9-a249-4664-95fc-b1062db2038f
+    Cache.store(*('bar',)) -> dcddd00c-4219-4dd7-8877-66afbe8e7df8
+    Cache.store(*(42,)) -> 5e752f2b-ecd8-4925-a3ce-e2efdee08d20
+    """
+    if fn is None or not hasattr(fn, '__self__'):
+        return
+    store = getattr(fn.__self__, '_redis', None)
+    if not isinstance(store, redis.Redis):
+        return
+    function = fn.__qualname__
+    in_key = '{}:inputs'.format(function)
+    out_key = '{}:outputs'.format(function)
+    calls = 0
+    if store.exists(function) != 0:
+        calls = int(store.get(function))
+    print('{} was called {} times:'.format(function, calls))
+    inputs = store.lrange(in_key, 0, -1)
+    outputs = store.lrange(out_key, 0, -1)
+    for input, output in zip(inputs, outputs):
+        print('{}(*{}) -> {}'.format(
+            function,
+            input.decode("utf-8"),
+            output,
+        ))
 
 class Cache:
     """cache class"""
