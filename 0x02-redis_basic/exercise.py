@@ -30,6 +30,21 @@ def count_calls(method: Callable) -> Callable:
         return method(self, *args, **kwargs)
     return caller
 
+def call_history(method: Callable) -> Callable:
+    """decorator"""
+    @wraps(method)
+    def caller(self, *args, **kwargs) -> Any:
+        """calls the method"""
+        key_of_input = '{}:inputs'.format(method.__qualname__)
+        key_of_output = '{}:outputs'.format(method.__qualname__)
+        if isinstance(self._redis, redis.Redis):
+            self._redis.rpush(key_of_input, str(args))
+        return_val = method(self, *args, **kwargs)
+        if isinstance(self._redis, redis.Redis):
+            self._redis.rpush(key_of_output, return_val)
+        return return_val
+    return caller
+
 class Cache:
     """cache class"""
     def __init__(self) -> None:
