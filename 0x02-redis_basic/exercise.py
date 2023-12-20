@@ -33,7 +33,7 @@ def count_calls(method: Callable) -> Callable:
 def call_history(method: Callable) -> Callable:
     """decorator"""
     @wraps(method)
-    def caller(self, *args, **kwargs) -> Any:
+    def caller(self, *args, **kwargs):
         """calls the method"""
         key_of_input = '{}:inputs'.format(method.__qualname__)
         key_of_output = '{}:outputs'.format(method.__qualname__)
