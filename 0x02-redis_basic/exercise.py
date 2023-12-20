@@ -52,6 +52,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb(True)
 
+    @call_history
     @count_calls
     def store(self, data: Data) -> str:
         """stores data to redis"""
