@@ -22,25 +22,32 @@ import requests
 from functools import wraps
 from typing import Callable
 
-redis_store = redis.Redis()
+store = redis.Redis()
 
 
-def cached(method: Callable) -> Callable:
+def cache_deco(method: Callable) -> Callable:
     """decorator"""
     @wraps(method)
     def caller(url) -> str:
         """calls the method"""
-        result = redis_store.get(f'result:{url}')
-        if result:
-            return result.decode('utf-8')
-        result = method(url)
-        redis_store.set(f'count:{url}', 0)
-        redis_store.setex(f'result:{url}', 10, result)
-        return result
+        store.incr(f'count:{url}')
+
+        return_value = store.get(f'value:{url}')
+
+        if return_value:
+            return return_value.decode('utf-8')
+
+        return_value = method(url)
+
+        store.set(f'count:{url}', 0)
+
+        store.setex(f'value:{url}', 10, return_value)
+
+        return return_value
     return caller
 
 
-@cached
+@cache_deco
 def get_page(url: str) -> str:
     """gets HTML from url"""
     return requests.get(url).text
